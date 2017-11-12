@@ -277,6 +277,23 @@ jed_doc_elements_set* jed_doc_set_enum(jed_doc_elements_set* set, int(*condition
 	return out;
 }
 
+jed_doc_elements_set* jed_doc_set_enum_children(jed_doc_elements_set* set, int(*condition)(jed_doc_element* e, void* data), void* data) {
+	int i;
+	jed_doc_elements_set* out = jed_doc_create_set();
+	for(i=0; i < set->nElements; ++i) {
+		jed_doc_element* e = set->elements[i];
+		if( e->type != JDOC_TYPE_OBJECT && e->type != JDOC_TYPE_ARRAY )
+			continue;
+		jed_doc_element* c = e->v.children;
+		while( c ) {
+			if( !condition || condition(c, data) )
+				jed_doc_set_append(out, c);
+			c = c->next;
+		}
+	}
+	return out;
+}
+
 void jed_doc_print_set(FILE* os, jed_doc_elements_set* set) {
 	doc_print_context ctx = {0};
 	int n;

@@ -50,7 +50,7 @@ static int condition_keymatch(jed_doc_element* e, void* data) {
 }
 
 static int condition_indexrange(jed_doc_element* e, void* data) {
-	ASSERT(e->parent->type==JDOC_TYPE_ARRAY, "Cannot index on none-array elements!");
+	ASSERT(e->parent && e->parent->type==JDOC_TYPE_ARRAY, "Cannot index on none-array elements!");
 	const index_range* range = (const index_range*)data;
 	int i=0;
 	jed_doc_element* c = e->parent->v.children;
@@ -127,7 +127,7 @@ static void onPathLevel(void* ctx) {
 
 static void onPathBeginPredicate(void* ctx) {
 	select_context const* selctx = (select_context const*)ctx;
-	jed_path_expand_set(selctx->ppResults);
+//	jed_path_expand_set(selctx->ppResults);
 }
 
 static void onPathKey(char const* key, void* ctx) {
@@ -141,7 +141,7 @@ static void onPathKey(char const* key, void* ctx) {
 
 static void onPathIndexRange(index_range const* range, void* ctx) {
 	select_context const* selctx = (select_context const*)ctx;
-	jed_doc_elements_set* out = jed_doc_set_enum(*selctx->ppResults, condition_indexrange, (void*)range);
+	jed_doc_elements_set* out = jed_doc_set_enum_children(*selctx->ppResults, condition_indexrange, (void*)range);
 	if( ! out->nElements && (selctx->opt & SELECT_OPT_ADDMISSING) ) {
 	}
 	jed_doc_destroy_set(*selctx->ppResults);
@@ -150,7 +150,7 @@ static void onPathIndexRange(index_range const* range, void* ctx) {
 
 static void onPathValueMask(char const* mask, void* ctx) {
 	select_context const* selctx = (select_context const*)ctx;
-	jed_doc_elements_set* out = jed_doc_set_enum(*selctx->ppResults, condition_valuemask, (void*)mask);
+	jed_doc_elements_set* out = jed_doc_set_enum_children(*selctx->ppResults, condition_valuemask, (void*)mask);
 	jed_doc_destroy_set(*selctx->ppResults);
 	*selctx->ppResults = out;
 }

@@ -67,6 +67,7 @@ void jed_doc_destroy_set(jed_doc_elements_set* set);
 void jed_doc_reset_set(jed_doc_elements_set* set);
 void jed_doc_set_append(jed_doc_elements_set* set, jed_doc_element* e);
 jed_doc_elements_set* jed_doc_set_enum(jed_doc_elements_set* set, int(*condition)(jed_doc_element* e, void* data), void* data);
+jed_doc_elements_set* jed_doc_set_enum_children(jed_doc_elements_set* set, int(*condition)(jed_doc_element* e, void* data), void* data);
 void jed_doc_print_set(FILE* os, jed_doc_elements_set* set);
 
 #endif

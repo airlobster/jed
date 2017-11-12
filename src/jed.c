@@ -61,7 +61,7 @@ static void process_expression(jed_document* doc, const char* expr, jed_doc_elem
 	}
 
 	// select elements from the original doc
-	jed_select(doc, lval, SELECT_OPT_ADDMISSING, set);
+	jed_select(doc, lval, op == OP_ASSIGN ? SELECT_OPT_ADDMISSING : 0, set);
 
 	// create a set of elements from the r-value
 	if( rval ) {
@@ -89,6 +89,11 @@ static void process_expression(jed_document* doc, const char* expr, jed_doc_elem
 			if( ! rset->nElements )
 				break; // nothing to assign
 			ASSERT(rset->nElements==1, "Cannot assign from more than one element!");
+			if( (*set)->nElements == 0 ) {
+				jed_doc_element* root = jed_doc_add_null(0, 0);
+				doc->elements = root;
+				jed_doc_set_append(*set, root);
+			}
 			int n;
 			for(n=0; n < (*set)->nElements; ++n) {
 				jed_doc_element* eold = (*set)->elements[n];
@@ -105,7 +110,7 @@ static void process_expression(jed_document* doc, const char* expr, jed_doc_elem
 					eold->next->prev = enew;
 				if( doc->elements == eold )
 					doc->elements = enew;
-				if( eold->parent->v.children == eold )
+				if( eold->parent && eold->parent->v.children == eold )
 					eold->parent->v.children = enew;
 				jed_doc_element_destroy(eold);
 			}
