@@ -13,5 +13,5 @@ Running **jed** with the **_--help_** option will print out all help information
 
 ## Notes
 **1.**	Embedded help information is taken from the _src/help_ file which gets included into the executable at build time
-	using the **_tostring_** script which is provided with the project.
+	using the **_tostring_** script which is provided with the project (see _makefile_).
 
