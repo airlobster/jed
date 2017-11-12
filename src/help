@@ -1,0 +1,32 @@
+Description:
+	JED: Command-line JSON editor.
+Usage:
+	jed {options}
+Options:
+	-e|--expression <expr>
+		Execute an expression on the input JSON file. See expressions syntax below.
+	-v|--verbose
+		Turn verbose mode on.
+	-h|--help
+		Show this help text.
+Expressions:
+	A JED expression contains a selection path string as its l-value, and an optional selection path or a
+	valid JSON structure as its r-value. Selection paths select one or more elements from the incoming
+	JSON file, or from the result of the previously executed  expression.
+	Expression Types:
+		Reference:
+			<path>
+		Assign:
+			<path>=<path>|<JSON>
+		Append:
+			<path>+=<path>|<JSON>
+		Delete:
+			-<path>
+Path Syntax:
+	Path := /<token>{/<token>...}
+	Token := <key mask>{[<predicate>]}
+	Predicate := <index>|<indexes range>|<value mask>|<not value mask>
+	Index := positive integer starting at 0
+	Indexes range := <index>-{<index>}
+	Value mask := Linux wildcard string
+	Not value mask := !<value mask>
