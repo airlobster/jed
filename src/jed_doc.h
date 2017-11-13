@@ -37,8 +37,7 @@ typedef struct __jed_document {
 jed_document* jed_doc_create();
 jed_document* jed_doc_clone(jed_document* doc);
 void jed_doc_destroy(jed_document* doc);
-
-void jed_doc_print(FILE* os, jed_doc_element* doc);
+void jed_doc_print(FILE* os, jed_document* doc);
 
 void jed_doc_append_element(jed_doc_element* parent, jed_doc_element* e);
 

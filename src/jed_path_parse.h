@@ -14,6 +14,7 @@ typedef struct _index_range {
 
 typedef struct _path_handler {
 	void(*onLevel)(void* ctx);
+	void(*onLevelRecursive)(void* ctx);
 	void(*onKey)(char const* mask, void* ctx);
 	void(*onBeginPredicate)(void* ctx);
 	void(*onEndPredicate)(void* ctx);

@@ -125,9 +125,9 @@ static void onPathLevel(void* ctx) {
 	jed_path_expand_set(selctx->ppResults);
 }
 
-static void onPathBeginPredicate(void* ctx) {
+static void onPathLevelRecursive(void* ctx) {
 	select_context const* selctx = (select_context const*)ctx;
-//	jed_path_expand_set(selctx->ppResults);
+	ASSERT(0, "Recursive search is not implemented yet!");
 }
 
 static void onPathKey(char const* key, void* ctx) {
@@ -160,7 +160,7 @@ int jed_select(jed_document* doc, const char* path, unsigned long opt, jed_doc_e
 	select_context ctx = { opt, ppResults };
 	path_handler handler = {0};
 	handler.onLevel = onPathLevel;
-	handler.onBeginPredicate = onPathBeginPredicate;
+	handler.onLevelRecursive = onPathLevelRecursive;
 	handler.onKey = onPathKey;
 	handler.onIndexRange = onPathIndexRange;
 	handler.onValueMask = onPathValueMask;

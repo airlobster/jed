@@ -56,15 +56,14 @@ jed_doc_element* jed_doc_element_create(jed_doc_element* parent, jed_doc_element
 void jed_doc_append_element(jed_doc_element* parent, jed_doc_element* e) {
 	ASSERT(parent->type == JDOC_TYPE_OBJECT || parent->type == JDOC_TYPE_ARRAY,
 		"Cannot add childs to a none-container element");
-//	ASSERT(!e->key || parent->type == JDOC_TYPE_OBJECT, "Keys are only allowed in object children");
+	ASSERT(parent->type != JDOC_TYPE_OBJECT || e->key, "Object's children must have a key");
 	e->parent = parent;
 	e->prev = 0;
 	e->next = 0;
 	if( parent->v.children ) {
 		jed_doc_element* c = parent->v.children;
-		while( c->next ) {
+		while( c->next )
 			c = c->next;
-		}
 		c->next = e;
 		e->prev = c;
 	} else {
@@ -177,12 +176,13 @@ void jed_doc_element_destroy(jed_doc_element* element) {
 	free(element);
 }
 
-void jed_doc_print(FILE* os, jed_doc_element* doc) {
+void jed_doc_print(FILE* os, jed_document* doc) {
 	doc_print_context ctx;
 	ctx.nest = 0;
 	ctx.linesep = "\n";
 	ctx.indent = "\t";
-	jed_doc_print_element(os, doc, &ctx);
+	if( doc->elements )
+		jed_doc_print_element(os, doc->elements, &ctx);
 }
 
 static void jed_doc_print_element_children(FILE* os, jed_doc_element* e, doc_print_context* ctx) {

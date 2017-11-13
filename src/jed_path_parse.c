@@ -14,6 +14,7 @@
 typedef enum _jed_doc_path_state {
 	JPATH_STATE_BEGIN,
 	JPATH_STATE_TOKEN,
+	JPATH_STATE_RECURSE,
 	JPATH_STATE_KEY,
 	JPATH_STATE_PREDICATE,
 	JPATH_STATE_INDEXFROM,
@@ -54,8 +55,7 @@ int jed_path_parse(const char* path, path_handler const* handler, void* ctx) {
 				if( !*p )
 					break;
 				if( *p == '/' ) {
-					if( handler->onLevel )
-						handler->onLevel(ctx);
+					stack_push(state, (void*)JPATH_STATE_RECURSE);
 				} else if( *p == '[' ) {
 					if( handler->onBeginPredicate )
 						handler->onBeginPredicate(ctx);
@@ -65,6 +65,18 @@ int jed_path_parse(const char* path, path_handler const* handler, void* ctx) {
 					tokstart = p;
 					--p;
 					stack_push(state, (void*)JPATH_STATE_KEY);
+				}
+				break;
+			}
+			case JPATH_STATE_RECURSE: {
+				stack_pop(state);
+				if( *p == '/' ) {
+					if( handler->onLevelRecursive )
+						handler->onLevelRecursive(ctx);
+				} else {
+					if( handler->onLevel )
+						handler->onLevel(ctx);
+					--p;
 				}
 				break;
 			}
