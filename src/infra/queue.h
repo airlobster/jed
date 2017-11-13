@@ -5,16 +5,18 @@
 
 struct _queue_element;
 
+typedef void(*dtor)(void* e);
+typedef void*(*clone)(void* e);
+
 typedef struct _queue {
 	struct _queue_element* first;
 	struct _queue_element* last;
 	long length;
-	void(*dtor)(void* e);
-	void*(*clone)(void* e);
+	dtor fd;
+	clone fc;
 } queue;
 
-
-queue* queue_create(void(*dtor)(void* e), void*(*clone)(void* e));
+queue* queue_create(dtor fd, clone fc);
 void queue_destroy(queue* q);
 
 long queue_length(queue* q);

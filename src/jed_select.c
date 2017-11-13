@@ -14,6 +14,7 @@
 
 typedef struct _select_context {
 	unsigned long opt;
+	jed_document* doc;
 	jed_doc_elements_set** ppResults;
 } select_context;
 
@@ -101,7 +102,7 @@ static void jed_path_expand_set(jed_doc_elements_set** ppset) {
 }
 
 static void add_new_keyed_element(jed_doc_elements_set* siblings, jed_doc_elements_set* set, char const* key) {
-	TRACE("Adding key \"%s\"", key);
+	LOG("Adding key \"%s\"", key);
 	int n;
 	for(n=0; n < siblings->nElements; ++n) {
 		jed_doc_element* parent = siblings->elements[n]->parent;
@@ -115,7 +116,7 @@ static void add_new_keyed_element(jed_doc_elements_set* siblings, jed_doc_elemen
 }
 
 static void add_index(jed_doc_elements_set* set, int index) {
-	TRACE("Adding index \"%d\"", index);
+	LOG("Adding index \"%d\"", index);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -133,8 +134,9 @@ static void onPathLevelRecursive(void* ctx) {
 static void onPathKey(char const* key, void* ctx) {
 	select_context const* selctx = (select_context const*)ctx;
 	jed_doc_elements_set* out = jed_doc_set_enum(*selctx->ppResults, condition_keymatch, (void*)key);
-	if( ! out->nElements && (selctx->opt & SELECT_OPT_ADDMISSING) && ! iswildcard(key) )
-		add_new_keyed_element(*selctx->ppResults, out, key);	
+	if( ! out->nElements && (selctx->opt & SELECT_OPT_ADDMISSING) && ! iswildcard(key) ) {
+		add_new_keyed_element(*selctx->ppResults, out, key);
+	}
 	jed_doc_destroy_set(*selctx->ppResults);
 	*selctx->ppResults = out;
 }
@@ -157,7 +159,7 @@ static void onPathValueMask(char const* mask, void* ctx) {
 
 
 int jed_select(jed_document* doc, const char* path, unsigned long opt, jed_doc_elements_set** ppResults) {
-	select_context ctx = { opt, ppResults };
+	select_context ctx = { opt, doc, ppResults };
 	path_handler handler = {0};
 	handler.onLevel = onPathLevel;
 	handler.onLevelRecursive = onPathLevelRecursive;

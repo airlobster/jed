@@ -19,17 +19,17 @@ static queue_element* queue_create_element(queue* q, void* v) {
 }
 
 static void queue_destroy_element(queue* q, queue_element* e) {
-	if( q->dtor )
-		q->dtor(e->v);
+	if( q->fd )
+		q->fd(e->v);
 	free(e);
 }
 
-queue* queue_create(void(*dtor)(void* e), void*(*clone)(void* e)) {
+queue* queue_create(dtor fd, clone fc) {
 	queue* q = (queue*)malloc(sizeof(queue));
 	q->first = q->last = 0;
 	q->length = 0;
-	q->dtor = dtor;
-	q->clone = clone;
+	q->fd = fd;
+	q->fc = fc;
 	return q;
 }
 
@@ -118,11 +118,11 @@ void queue_enum(queue* q, int(*f)(void* e, void* ctx), void* ctx) {
 }
 
 void queue_select(queue* q, int(*condition)(void* e, void* ctx), void* ctx, queue** pqueue) {
-	queue* r = queue_create(q->dtor, q->clone);
+	queue* r = queue_create(q->fd, q->fc);
 	queue_element* e = q->first;
 	while( e ) {
 		if( ! condition || condition(e->v, ctx) )
-			queue_pushtail(r, q->clone ? q->clone(e->v) : e->v);
+			queue_pushtail(r, q->fc ? q->fc(e->v) : e->v);
 		e = e->next;
 	}
 	if( pqueue )
